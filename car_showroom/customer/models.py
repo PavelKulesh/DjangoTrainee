@@ -8,9 +8,6 @@ from showroom.models import ShowroomModel
 class CustomerModel(AbstractUser, BaseModel):
     is_confirmed = models.BooleanField(default=False)
     balance = models.FloatField(validators=[MinValueValidator(0)], default=0)
-    money_spent = models.FloatField(validators=[MinValueValidator(0)], default=0)
-    car_quantity = models.PositiveSmallIntegerField(default=0)
-    purchase_list = models.ManyToManyField(ShowroomModel, through='CustomerPurchase')
 
     def __str__(self):
         return self.username
