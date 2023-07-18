@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import CustomerModel, CustomerPurchase, CustomerOffer
+from .models import Customer, CustomerPurchase, CustomerOffer
 
-admin.site.register(CustomerModel)
+admin.site.register(Customer)
 admin.site.register(CustomerPurchase)
 admin.site.register(CustomerOffer)

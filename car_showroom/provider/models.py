@@ -1,14 +1,15 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-from common.models import BaseModel, BaseDiscount, CarModel
+from car_showroom.models import BaseModel, BaseDiscount
+from car.models import CarModel
 
 
-class ProviderModel(BaseModel):
+class Provider(BaseModel):
     name = models.CharField(max_length=50)
     foundation_year = models.PositiveSmallIntegerField(default=2010)
     showroom_quantity = models.IntegerField(validators=[MinValueValidator(0)], default=0)
-    balance = models.FloatField(validators=[MinValueValidator(0)], default=0)
-    car_list = models.ManyToManyField(CarModel, through='ProviderCar')
+    balance = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    model_list = models.ManyToManyField(CarModel, through='ProviderCar')
     discount_percent = models.PositiveSmallIntegerField(validators=[MaxValueValidator(100)], default=5)
     quantity_for_discount = models.PositiveSmallIntegerField(default=20)
 
@@ -23,12 +24,12 @@ class ProviderModel(BaseModel):
 
 
 class ProviderCar(BaseModel):
-    provider = models.ForeignKey(ProviderModel, on_delete=models.RESTRICT, null=True)
-    car = models.ForeignKey(CarModel, on_delete=models.RESTRICT, null=True)
-    provider_price = models.FloatField(validators=[MinValueValidator(0)], default=0)
+    provider = models.ForeignKey(Provider, on_delete=models.RESTRICT, null=True)
+    model = models.ForeignKey(CarModel, on_delete=models.RESTRICT, null=True)
+    provider_price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)], default=0)
 
     def __str__(self):
-        return f'Car {self.car.name} of prov {self.provider.name}'
+        return f'Car {self.model} of prov {self.provider}'
 
     class Meta:
         db_table = 'provider_cars'
@@ -38,11 +39,11 @@ class ProviderCar(BaseModel):
 
 
 class ProviderDiscount(BaseModel, BaseDiscount):
-    provider = models.ForeignKey(ProviderModel, on_delete=models.RESTRICT, null=True)
-    car_list = models.ManyToManyField(CarModel)
+    provider = models.ForeignKey(Provider, on_delete=models.RESTRICT, null=True)
+    model_list = models.ManyToManyField(CarModel)
 
     def __str__(self):
-        return f'Disc {self.pk} of prov {self.provider.name}'
+        return f'Disc {self.pk} of prov {self.provider}'
 
     class Meta:
         db_table = 'provider_discounts'

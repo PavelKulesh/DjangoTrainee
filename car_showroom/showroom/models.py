@@ -1,15 +1,16 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django_countries.fields import CountryField
-from common.models import BaseModel, BaseDiscount, BaseCarCharacteristics, CarModel
-from provider.models import ProviderModel
+from car_showroom.models import BaseModel, BaseDiscount, BaseCarCharacteristics
+from car.models import CarModel
+from provider.models import Provider
 
 
-class ShowroomModel(BaseModel):
+class Showroom(BaseModel):
     name = models.CharField(max_length=50)
     location = CountryField(default='US')
-    balance = models.FloatField(validators=[MinValueValidator(0)], default=0)
-    car_list = models.ManyToManyField(CarModel, through='ShowroomCar')
+    balance = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    model_list = models.ManyToManyField(CarModel, through='ShowroomCar')
     discount_percent = models.PositiveSmallIntegerField(validators=[MaxValueValidator(100)], default=5)
     quantity_for_discount = models.PositiveSmallIntegerField(default=10)
 
@@ -23,28 +24,57 @@ class ShowroomModel(BaseModel):
         ordering = ['-updated_at']
 
 
-class ShowroomCarCharacteristics(BaseModel, BaseCarCharacteristics):
-    showroom = models.ForeignKey(ShowroomModel, on_delete=models.RESTRICT, null=True)
+class ShowroomCarBrand(BaseModel):
+    showroom = models.ForeignKey(Showroom, on_delete=models.RESTRICT, null=True)
+    brand = models.CharField(max_length=20, choices=BaseCarCharacteristics.BRAND_CHOICES)
 
     def __str__(self):
-        return f'Char {self.pk} of {self.showroom.name}'
+        return self.brand
 
     class Meta:
-        db_table = 'sr_characteristics'
-        verbose_name = 'SR_Characteristic'
-        verbose_name_plural = 'SR_Characteristics'
+        db_table = 'sr_car_brands'
+        verbose_name = 'SR_Brand'
+        verbose_name_plural = 'SR_Brands'
+        ordering = ['-updated_at']
+
+
+class ShowroomCarFuel(BaseModel):
+    showroom = models.ForeignKey(Showroom, on_delete=models.RESTRICT, null=True)
+    fuel = models.CharField(max_length=20, choices=BaseCarCharacteristics.FUEL_TYPE_CHOICES)
+
+    def __str__(self):
+        return self.fuel
+
+    class Meta:
+        db_table = 'sr_car_fuel'
+        verbose_name = 'SR_Fuel'
+        verbose_name_plural = 'SR_Fuel'
+        ordering = ['-updated_at']
+
+
+class ShowroomCarTransmission(BaseModel):
+    showroom = models.ForeignKey(Showroom, on_delete=models.RESTRICT, null=True)
+    transmission = models.CharField(max_length=20, choices=BaseCarCharacteristics.TRANSMISSION_CHOICES)
+
+    def __str__(self):
+        return self.transmission
+
+    class Meta:
+        db_table = 'sr_car_transmissions'
+        verbose_name = 'SR_Transmission'
+        verbose_name_plural = 'SR_Transmissions'
         ordering = ['-updated_at']
 
 
 class ShowroomCar(BaseModel):
-    showroom = models.ForeignKey(ShowroomModel, on_delete=models.RESTRICT, null=True)
-    car = models.ForeignKey(CarModel, on_delete=models.RESTRICT, null=True)
-    provider = models.ForeignKey(ProviderModel, on_delete=models.RESTRICT, null=True, blank=True)
-    showroom_price = models.FloatField(validators=[MinValueValidator(0)], default=0)
+    showroom = models.ForeignKey(Showroom, on_delete=models.RESTRICT, null=True)
+    model = models.ForeignKey(CarModel, on_delete=models.RESTRICT, null=True)
+    provider = models.ForeignKey(Provider, on_delete=models.RESTRICT, null=True, blank=True)
+    showroom_price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     quantity = models.PositiveSmallIntegerField(default=0)
 
     def __str__(self):
-        return f'Car {self.car.name} of show {self.showroom.name}'
+        return f'Car {self.model} of show {self.showroom}'
 
     class Meta:
         db_table = 'sr_car'
@@ -54,14 +84,14 @@ class ShowroomCar(BaseModel):
 
 
 class ShowroomPurchase(BaseModel):
-    showroom = models.ForeignKey(ShowroomModel, on_delete=models.RESTRICT, null=True)
-    provider = models.ForeignKey(ProviderModel, on_delete=models.RESTRICT, null=True)
-    car = models.ForeignKey(CarModel, on_delete=models.RESTRICT, null=True)
+    showroom = models.ForeignKey(Showroom, on_delete=models.RESTRICT, null=True)
+    provider = models.ForeignKey(Provider, on_delete=models.RESTRICT, null=True)
+    model = models.ForeignKey(CarModel, on_delete=models.RESTRICT, null=True)
     quantity = models.PositiveSmallIntegerField(default=0)
     amount = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f'Pur {self.car.name} of {self.showroom.name}'
+        return f'Pur {self.model} of show {self.showroom}'
 
     class Meta:
         db_table = 'sr_purchases'
@@ -71,11 +101,11 @@ class ShowroomPurchase(BaseModel):
 
 
 class ShowroomDiscount(BaseModel, BaseDiscount):
-    showroom = models.ForeignKey(ShowroomModel, on_delete=models.RESTRICT, null=True)
-    car_list = models.ManyToManyField(CarModel)
+    showroom = models.ForeignKey(Showroom, on_delete=models.RESTRICT, null=True)
+    model_list = models.ManyToManyField(CarModel)
 
     def __str__(self):
-        return f'Disc {self.pk} of prov {self.showroom.name}'
+        return f'Disc {self.pk} of show {self.showroom}'
 
     class Meta:
         db_table = 'sr_discounts'

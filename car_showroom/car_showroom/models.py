@@ -23,6 +23,32 @@ class BaseDiscount(models.Model):
 
 
 class BaseCarCharacteristics(models.Model):
+    BRAND_CHOICES = [
+        ('Toyota', 'Toyota'),
+        ('Honda', 'Honda'),
+        ('Ford', 'Ford'),
+        ('BMW', 'BMW'),
+        ('Mercedes-Benz', 'Mercedes-Benz'),
+        ('Audi', 'Audi'),
+        ('Chevrolet', 'Chevrolet'),
+        ('Volkswagen', 'Volkswagen'),
+        ('Hyundai', 'Hyundai'),
+        ('Nissan', 'Nissan'),
+        ('Kia', 'Kia'),
+        ('Volvo', 'Volvo'),
+        ('Subaru', 'Subaru'),
+        ('Mazda', 'Mazda'),
+        ('Lexus', 'Lexus'),
+        ('Tesla', 'Tesla'),
+        ('Porsche', 'Porsche'),
+        ('Jeep', 'Jeep'),
+        ('Land Rover', 'Land Rover'),
+        ('Ferrari', 'Ferrari'),
+        ('Lamborghini', 'Lamborghini'),
+        ('Maserati', 'Maserati'),
+        ('Bentley', 'Bentley'),
+    ]
+
     BODY_TYPE_CHOICES = [
         ('Sedan', 'Sedan'),
         ('Hatchback', 'Hatchback'),
@@ -51,9 +77,10 @@ class BaseCarCharacteristics(models.Model):
         ('All', 'All'),
     ]
 
+    brand = models.CharField(max_length=20, choices=BRAND_CHOICES)
     issue_year = models.PositiveSmallIntegerField(default=2010)
     body_type = models.CharField(max_length=20, choices=BODY_TYPE_CHOICES)
-    engine_capacity = models.FloatField(validators=[MinValueValidator(0)], default=0)
+    engine_capacity = models.DecimalField(max_digits=3, decimal_places=1, validators=[MinValueValidator(0)], default=0)
     engine_power = models.PositiveIntegerField(default=0)
     fuel_type = models.CharField(max_length=20, choices=FUEL_TYPE_CHOICES)
     transmission = models.CharField(max_length=20, choices=TRANSMISSION_CHOICES)
@@ -61,16 +88,3 @@ class BaseCarCharacteristics(models.Model):
 
     class Meta:
         abstract = True
-
-
-class CarModel(BaseModel, BaseCarCharacteristics):
-    name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'cars'
-        verbose_name = 'Car'
-        verbose_name_plural = 'Cars'
-        ordering = ['-updated_at']

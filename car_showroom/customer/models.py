@@ -1,13 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
-from common.models import BaseModel, CarModel
-from showroom.models import ShowroomModel
+from car_showroom.models import BaseModel
+from car.models import CarModel
+from showroom.models import Showroom
 
 
-class CustomerModel(AbstractUser, BaseModel):
+class Customer(AbstractUser, BaseModel):
     is_confirmed = models.BooleanField(default=False)
-    balance = models.FloatField(validators=[MinValueValidator(0)], default=0)
+    balance = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)], default=0)
 
     def __str__(self):
         return self.username
@@ -20,13 +21,13 @@ class CustomerModel(AbstractUser, BaseModel):
 
 
 class CustomerPurchase(BaseModel):
-    customer = models.ForeignKey(CustomerModel, on_delete=models.RESTRICT, null=True)
-    showroom = models.ForeignKey(ShowroomModel, on_delete=models.RESTRICT, null=True)
-    car = models.ForeignKey(CarModel, on_delete=models.RESTRICT, null=True)
-    price = models.FloatField(validators=[MinValueValidator(0)], default=0)
+    customer = models.ForeignKey(Customer, on_delete=models.RESTRICT, null=True)
+    showroom = models.ForeignKey(Showroom, on_delete=models.RESTRICT, null=True)
+    model = models.ForeignKey(CarModel, on_delete=models.RESTRICT, null=True)
+    price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)], default=0)
 
     def __str__(self):
-        return f'Pur {self.car.name} of cust {self.customer}'
+        return f'Pur {self.model} of cust {self.customer}'
 
     class Meta:
         db_table = 'customer_purchases'
@@ -36,12 +37,12 @@ class CustomerPurchase(BaseModel):
 
 
 class CustomerOffer(BaseModel):
-    customer = models.ForeignKey(CustomerModel, on_delete=models.RESTRICT, null=True)
-    max_price = models.FloatField(validators=[MinValueValidator(0)], default=0)
-    car = models.ForeignKey(CarModel, on_delete=models.RESTRICT, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.RESTRICT, null=True)
+    max_price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    model = models.ForeignKey(CarModel, on_delete=models.RESTRICT, null=True)
 
     def __str__(self):
-        return f'Off {self.car.name} of cust {self.customer}'
+        return f'Off {self.model} of cust {self.customer}'
 
     class Meta:
         db_table = 'customer_offers'

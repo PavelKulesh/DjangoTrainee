@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'showroom.apps.ShowroomConfig',
     'provider.apps.ProviderConfig',
     'customer.apps.CustomerConfig',
-    'common.apps.CommonConfig',
+    'car.apps.CarConfig',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +86,7 @@ DATABASES = {
 }
 
 
-AUTH_USER_MODEL = 'customer.CustomerModel'
+AUTH_USER_MODEL = 'customer.Customer'
 
 
 # Password validation
