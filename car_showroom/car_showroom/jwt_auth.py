@@ -50,7 +50,7 @@ def refresh_access_token(refresh_token):
 
         return {'access': new_access_token}
 
-    return {'msg': 'Invalid Refresh Token'}
+    return {'error': 'Invalid Refresh Token'}
 
 
 def check_token(token):
