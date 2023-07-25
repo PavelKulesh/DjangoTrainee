@@ -6,7 +6,8 @@ from car.models import CarModel
 from showroom.models import Showroom
 
 
-class Customer(AbstractUser, BaseModel):
+class Customer(BaseModel, AbstractUser):
+    email = models.EmailField(unique=True)
     is_confirmed = models.BooleanField(default=False)
     balance = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)], default=0)
 

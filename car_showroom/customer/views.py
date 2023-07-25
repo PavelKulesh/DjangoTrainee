@@ -1,21 +1,95 @@
-from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
+from django.db.models import Q
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.views import APIView
-from django.core.exceptions import ObjectDoesNotExist
-from car_showroom.jwt_auth import get_tokens, refresh_access_token
-from .serializers import CustomerSerializer, LoginSerializer, RefreshTokenSerializer
-from .models import Customer
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from car_showroom.permissions import IsSuperUserOrOwner, IsSuperUserOrOwnerReadOnly, IsSuperUserOrOwnerAndEmailConfirmed
+from .serializers import CustomerSerializer, CustomerPurchaseSerializer, CustomerOfferSerializer
+from .models import Customer, CustomerPurchase, CustomerOffer
+from .services import get_data_for_serializer, login, refresh_token
 
 
-class CustomerProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+class CustomerViewSet(viewsets.ModelViewSet):
+    serializer_class = CustomerSerializer
+    permission_classes = [IsSuperUserOrOwner]
+    allowed_fields = ['first_name', 'last_name', 'username', 'email', 'password']
 
-    def get(self, request):
-        customer = request.user
-        serializer = CustomerSerializer(customer)
-        return Response(serializer.data)
+    def get_queryset(self):
+        queryset = Customer.objects.all()
+
+        if not self.request.user.is_superuser:
+            queryset = queryset.filter(Q(id=self.request.user.id) & Q(is_active=True))
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        data = get_data_for_serializer(self, request)
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = get_data_for_serializer(self, request)
+
+        serializer = self.get_serializer(instance, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        if 'email' in data and data['email'] != instance.email:
+            serializer.validated_data['is_confirmed'] = False
+
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CustomerPurchaseViewSet(viewsets.ModelViewSet):
+    serializer_class = CustomerPurchaseSerializer
+    permission_classes = [IsSuperUserOrOwnerReadOnly]
+
+    def get_queryset(self):
+        queryset = CustomerPurchase.objects.all()
+
+        if not self.request.user.is_superuser:
+            queryset = queryset.filter(Q(customer_id=self.request.user.id) & Q(is_active=True))
+
+        return queryset
+
+
+class CustomerOfferViewSet(viewsets.ModelViewSet):
+    serializer_class = CustomerOfferSerializer
+    permission_classes = [IsSuperUserOrOwnerAndEmailConfirmed]
+    allowed_fields = ['model', 'max_price']
+
+    def get_queryset(self):
+        queryset = CustomerOffer.objects.all()
+
+        if not self.request.user.is_superuser:
+            queryset = queryset.filter(Q(customer_id=self.request.user.id) & Q(is_active=True))
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        data = get_data_for_serializer(self, request)
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.validated_data['customer_id'] = request.user.id
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = get_data_for_serializer(self, request)
+
+        serializer = self.get_serializer(instance, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AuthViewSet(viewsets.ViewSet):
@@ -25,48 +99,8 @@ class AuthViewSet(viewsets.ViewSet):
         action = request.data.get('action')
 
         if action == 'login':
-            return self.login(request)
+            return login(request)
         elif action == 'refresh':
-            return self.refresh_token(request)
+            return refresh_token(request)
         else:
             return Response({'error': 'Invalid action! Choose login or refresh.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    def login(self, request):
-        serializer = LoginSerializer(data=request.data)
-
-        try:
-            serializer.is_valid(raise_exception=True)
-        except ValidationError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        username = serializer.validated_data['username']
-        password = serializer.validated_data['password']
-
-        try:
-            user = Customer.objects.get(username=username)
-        except ObjectDoesNotExist:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not user.check_password(password):
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
-
-        user_id = user.id
-        payload = {"user_id": user_id, "username": username}
-
-        tokens = get_tokens(payload)
-
-        return Response(tokens, status=status.HTTP_200_OK)
-
-    def refresh_token(self, request):
-        serializer = RefreshTokenSerializer(data=request.data)
-
-        try:
-            serializer.is_valid(raise_exception=True)
-        except ValidationError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        refresh_token = serializer.validated_data['refresh']
-
-        access_token = refresh_access_token(refresh_token)
-
-        return Response(access_token, status=status.HTTP_200_OK)

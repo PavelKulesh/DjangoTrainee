@@ -7,6 +7,10 @@ class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def delete(self, *args, **kwargs):
+        self.is_active = False
+        self.save()
+
     class Meta:
         abstract = True
 
@@ -78,10 +82,10 @@ class BaseCarCharacteristics(models.Model):
     ]
 
     brand = models.CharField(max_length=20, choices=BRAND_CHOICES)
-    issue_year = models.PositiveSmallIntegerField(default=2010)
+    issue_year = models.PositiveSmallIntegerField()
     body_type = models.CharField(max_length=20, choices=BODY_TYPE_CHOICES)
-    engine_capacity = models.DecimalField(max_digits=3, decimal_places=1, validators=[MinValueValidator(0)], default=0)
-    engine_power = models.PositiveIntegerField(default=0)
+    engine_capacity = models.DecimalField(max_digits=3, decimal_places=1, validators=[MinValueValidator(0)])
+    engine_power = models.PositiveIntegerField()
     fuel_type = models.CharField(max_length=20, choices=FUEL_TYPE_CHOICES)
     transmission = models.CharField(max_length=20, choices=TRANSMISSION_CHOICES)
     drive_unit = models.CharField(max_length=20, choices=DRIVE_UNIT_CHOICES)
