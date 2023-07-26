@@ -41,9 +41,8 @@ class IsSuperUserOrOwnerReadOnly(IsSuperUserOrOwner):
 
 class IsSuperUserOrOwnerAndEmailConfirmed(IsSuperUserOrOwnerReadOnly):
     def has_permission(self, request, view):
-        if request.method in ['GET', 'HEAD', 'OPTIONS'] and request.user.id:
-            return True
-        elif request.method in ['POST', 'PATCH', 'DELETE'] and request.user.id and request.user.is_confirmed:
+        if (request.method in ['GET', 'HEAD', 'OPTIONS'] and request.user.id) or (
+                request.method in ['POST', 'PATCH', 'DELETE'] and request.user.id and request.user.is_confirmed):
             return True
 
         return request.user.is_superuser
