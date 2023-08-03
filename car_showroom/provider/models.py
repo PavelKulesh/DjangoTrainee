@@ -6,7 +6,7 @@ from car.models import CarModel
 
 class Provider(BaseModel):
     name = models.CharField(max_length=50)
-    foundation_year = models.PositiveSmallIntegerField(default=2010)
+    foundation_year = models.PositiveSmallIntegerField()
     showroom_quantity = models.IntegerField(validators=[MinValueValidator(0)], default=0)
     balance = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     model_list = models.ManyToManyField(CarModel, through='ProviderCar')

@@ -1,3 +1,14 @@
-from django.shortcuts import render
+from car_showroom.views import BaseModelViewSet
+from .serializers import ProviderSerializer, ProviderCarSerializer, ProviderDiscountSerializer
 
-# Create your views here.
+
+class ProviderViewSet(BaseModelViewSet):
+    serializer_class = ProviderSerializer
+
+
+class ProviderCarViewSet(BaseModelViewSet):
+    serializer_class = ProviderCarSerializer
+
+
+class ProviderDiscountViewSet(BaseModelViewSet):
+    serializer_class = ProviderDiscountSerializer

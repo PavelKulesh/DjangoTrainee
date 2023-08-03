@@ -1,3 +1,6 @@
-from django.shortcuts import render
+from car_showroom.views import BaseModelViewSet
+from .serializers import CarModelSerializer
 
-# Create your views here.
+
+class CarModelViewSet(BaseModelViewSet):
+    serializer_class = CarModelSerializer

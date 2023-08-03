@@ -3,10 +3,14 @@ import hashlib
 import hmac
 import json
 import time
+import os
+from dotenv import load_dotenv
 
-SECRET_KEY = 'django-insecure-c7s=%)u4#4^umx22#fav9up07l(d#-ybjiz_0e%ku^+nz=+i78'
-ACCESS_TOKEN_EXPIRATION = 3600
-REFRESH_TOKEN_EXPIRATION = 18000
+load_dotenv()
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+ACCESS_TOKEN_EXPIRATION = int(os.getenv('ACCESS_TOKEN_EXPIRATION'))
+REFRESH_TOKEN_EXPIRATION = int(os.getenv('REFRESH_TOKEN_EXPIRATION'))
 
 
 def generate_token(payload, expiration):

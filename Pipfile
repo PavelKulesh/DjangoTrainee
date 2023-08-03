@@ -23,6 +23,7 @@ psycopg2-binary = "*"
 djangorestframework = "*"
 markdown = "*"
 django-filter = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

@@ -1,11 +1,14 @@
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
-from .views import AuthViewSet
+from .views import AuthViewSet, CustomerViewSet, CustomerPurchaseViewSet, CustomerOfferViewSet
 
-simple_router = SimpleRouter()
+router = SimpleRouter()
 
-simple_router.register(r'login', AuthViewSet, basename='login')
+router.register(r'login', AuthViewSet, basename='auth')
+router.register(r'purchase', CustomerPurchaseViewSet, basename='customer-purchase')
+router.register(r'offer', CustomerOfferViewSet, basename='customer-offer')
+router.register(r'', CustomerViewSet, basename='customer')
 
 urlpatterns = [
-    path('', include(simple_router.urls)),
+    path('', include(router.urls)),
 ]
