@@ -36,6 +36,7 @@ class ProviderCar(BaseModel):
         verbose_name = 'Provider_Car'
         verbose_name_plural = 'Provider_Cars'
         ordering = ['-updated_at']
+        unique_together = ['provider', 'model']
 
 
 class ProviderDiscount(BaseModel, BaseDiscount):

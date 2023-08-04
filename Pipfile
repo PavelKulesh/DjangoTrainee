@@ -24,6 +24,10 @@ djangorestframework = "*"
 markdown = "*"
 django-filter = "*"
 python-dotenv = "*"
+celery = "*"
+redis = "*"
+flower = "*"
+django-celery-beat = "*"
 
 [dev-packages]
 
