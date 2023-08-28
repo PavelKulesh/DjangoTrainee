@@ -3,7 +3,7 @@ version: '3'
 services:
   django:
     container_name: django
-    restart: always
+    restart: unless-stopped
     build: .
     ports:
       - "8000:8000"
@@ -17,7 +17,7 @@ services:
 
   postgres:
     container_name: postgres
-    restart: always
+    restart: unless-stopped
     image: postgres:latest
     ports:
       - "5432:5432"
@@ -28,8 +28,8 @@ services:
 
   pgadmin:
     container_name: pgadmin4
+    restart: unless-stopped
     image: dpage/pgadmin4
-    restart: always
     env_file:
       - ./car_showroom/.env
     ports:
@@ -46,6 +46,7 @@ services:
 
   celery:
     container_name: celery
+    restart: unless-stopped
     build: .
     command: "celery -A car_showroom worker --loglevel=info"
     env_file:
@@ -54,9 +55,10 @@ services:
       - ./car_showroom:/app
     depends_on:
       - redis
-    restart: always
 
   celery_beat:
+    container_name: celery_beat
+    restart: unless-stopped
     build:
       context: ./
     command: [ 'celery', '-A', 'car_showroom', 'beat' ]
@@ -69,6 +71,7 @@ services:
 
   flower:
     container_name: flower
+    restart: unless-stopped
     build:
       context: .
     command: "celery -A car_showroom flower"

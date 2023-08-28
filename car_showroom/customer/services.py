@@ -1,4 +1,9 @@
 from _decimal import Decimal
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
 from django.contrib.auth import login as last_login
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
@@ -118,3 +123,63 @@ def process_successful_purchase(offer, showroom, customer, showroom_car, final_p
     showroom.save()
     customer.save()
     showroom_car.save()
+
+
+def generate_confirmation_url(customer):
+    token = default_token_generator.make_token(customer)
+    uid = urlsafe_base64_encode(force_bytes(customer.pk))
+
+    confirmation_url = f"http://localhost:8000/api/customer/confirm/{uid}/{token}/"
+
+    return confirmation_url
+
+
+def send_confirmation_email(customer, confirmation_url):
+    subject = "Confirm Your Account"
+    message = f"Please confirm your account by clicking the following link: {confirmation_url}"
+
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [customer.email])
+
+
+def get_customer(uidb64):
+    uid = urlsafe_base64_decode(uidb64).decode()
+    customer = Customer.objects.get(pk=uid)
+
+    return customer
+
+
+def confirm_customer(customer):
+    customer.is_confirmed = True
+    customer.save()
+
+
+def generate_reset_url(customer):
+    token = default_token_generator.make_token(customer)
+    uid = urlsafe_base64_encode(force_bytes(customer.pk))
+
+    reset_url = f"http://localhost:8000/api/customer/password-reset/{uid}/{token}/"
+
+    return reset_url
+
+
+def send_reset_email(customer, reset_url):
+    subject = "Password Reset"
+    message = f"Click the following link to reset your password: {reset_url}"
+
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [customer.email])
+
+
+def generate_change_url(customer):
+    token = default_token_generator.make_token(customer)
+    uid = urlsafe_base64_encode(force_bytes(customer.pk))
+
+    change_url = f"http://localhost:8000/api/customer/email-change/{uid}/{token}/"
+
+    return change_url
+
+
+def send_change_email(customer, change_url):
+    subject = "Email Change"
+    message = f"Click the following link to change your email: {change_url}"
+
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [customer.email])

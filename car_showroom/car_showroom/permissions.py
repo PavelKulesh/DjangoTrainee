@@ -17,7 +17,7 @@ class IsSuperUserOrOwner(BasePermission):
         return obj == request.user
 
     def has_permission(self, request, view):
-        if request.method in ['GET', 'PATCH', 'HEAD', 'OPTIONS'] and request.user.id:
+        if request.method in ['GET', 'HEAD', 'OPTIONS'] or (request.method == 'PATCH' and request.user.id):
             return True
         elif request.method == 'POST' and not request.user.id:
             return True
