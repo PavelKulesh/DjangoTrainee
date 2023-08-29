@@ -26,6 +26,17 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
 
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    env_file:
+      - ./car_showroom/.env
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+
   redis:
     container_name: redis
     restart: unless-stopped
@@ -56,5 +67,21 @@ services:
       - ./car_showroom/.env
     entrypoint: [ "/entrypoint.sh", "celery_beat" ]
 
+  flower:
+    container_name: flower
+    build:
+      context: .
+    volumes:
+      - ./car_showroom:/app
+    depends_on:
+      - redis
+      - celery
+    env_file:
+      - ./car_showroom/.env
+    ports:
+      - "5555:5555"
+    entrypoint: [ "/entrypoint.sh", "flower" ]
+
 volumes:
   db:
+  pgadmin:

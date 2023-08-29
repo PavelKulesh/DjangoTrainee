@@ -5,7 +5,8 @@ from rest_framework.permissions import AllowAny
 from car_showroom.permissions import IsSuperUserOrOwner, IsSuperUserOrOwnerReadOnly, IsSuperUserOrOwnerAndEmailConfirmed
 from .serializers import CustomerSerializer, CustomerPurchaseSerializer, CustomerOfferSerializer
 from .models import Customer, CustomerPurchase, CustomerOffer
-from .services import get_data_for_serializer, login, refresh_token
+from .utils import get_data_for_serializer
+from .services import AuthorizationService
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -96,11 +97,12 @@ class AuthViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
 
     def create(self, request):
+        auth_service = AuthorizationService()
         action = request.data.get('action')
 
         if action == 'login':
-            return login(request)
+            return auth_service.login(request)
         elif action == 'refresh':
-            return refresh_token(request)
+            return auth_service.refresh_token(request)
         else:
             return Response({'error': 'Invalid action! Choose login or refresh.'}, status=status.HTTP_400_BAD_REQUEST)
