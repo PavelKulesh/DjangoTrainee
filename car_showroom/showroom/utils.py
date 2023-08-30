@@ -5,7 +5,6 @@ from django.utils import timezone
 from provider.models import ProviderCar
 from showroom.models import ShowroomCar, ShowroomPurchase
 from car.models import CarModel
-from customer.models import CustomerPurchase
 
 
 def get_filtered_cars(charact):
@@ -47,11 +46,6 @@ def update_showroom_car(showroom, car, provider_car):
     )
     showroom_car.showroom_price = provider_car.final_price * Decimal(1.1)
     showroom_car.save()
-
-
-def number_of_sales(showroom, car):
-    number = CustomerPurchase.objects.filter(showroom=showroom, model=car).count()
-    return number
 
 
 def get_individual_discount(showroom, provider):

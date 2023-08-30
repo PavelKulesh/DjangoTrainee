@@ -9,6 +9,8 @@ RUN pip install --no-cache-dir pipenv
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --system --deploy --ignore-pipfile
 
+COPY entrypoint.sh /
+
 COPY ./car_showroom /app
 
 EXPOSE 8000

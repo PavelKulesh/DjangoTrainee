@@ -1,7 +1,7 @@
 from celery import shared_task
 from django.shortcuts import get_object_or_404
 from .models import CustomerOffer
-from .services import get_cheapest_showroom_car, process_offered_car
+from .utils import get_cheapest_showroom_car, process_offered_car
 
 
 @shared_task
