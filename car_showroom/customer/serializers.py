@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from car_showroom.serializers import BaseModelSerializer
+from car.serializers import CarModelSerializer
 from .models import Customer, CustomerPurchase, CustomerOffer
 
 
@@ -43,3 +44,9 @@ class LoginSerializer(serializers.Serializer):
 
 class RefreshTokenSerializer(serializers.Serializer):
     refresh = serializers.CharField(max_length=255)
+
+
+class CustomerStatisticsSerializer(serializers.Serializer):
+    total_cost_amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+    count_of_purchases = serializers.IntegerField()
+    list_of_bought_cars = CarModelSerializer(many=True)

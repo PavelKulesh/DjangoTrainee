@@ -1,11 +1,13 @@
 from django.contrib.auth import login as last_login
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Sum
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from car_showroom.jwt_auth import get_tokens, refresh_access_token
+from car.models import CarModel
 from .serializers import LoginSerializer, RefreshTokenSerializer
-from .models import Customer
+from .models import Customer, CustomerPurchase
 
 
 class AuthorizationService:
@@ -50,3 +52,20 @@ class AuthorizationService:
         access_token = refresh_access_token(refresh_token)
 
         return Response(access_token, status=status.HTTP_200_OK)
+
+
+class CustomerStatisticsService:
+    @staticmethod
+    def total_cost_amount(customer):
+        purchases = CustomerPurchase.objects.filter(customer=customer).aggregate(total_price=Sum('price'))
+        return purchases['total_price'] or 0
+
+    @staticmethod
+    def count_of_purchases(customer):
+        return CustomerPurchase.objects.filter(customer=customer).count()
+
+    @staticmethod
+    def list_of_bought_cars(customer):
+        purchases = CustomerPurchase.objects.filter(customer=customer).values_list('model', flat=True)
+        car_models = CarModel.objects.filter(id__in=purchases)
+        return car_models
