@@ -1,11 +1,16 @@
 from rest_framework.permissions import IsAdminUser
 from car_showroom.views import BaseModelViewSet
-from .serializers import ShowroomSerializer, ShowroomCarSerializer, ShowroomDiscountSerializer, \
-    ShowroomCarBrandSerializer, ShowroomCarFuelSerializer, ShowroomCarTransmissionSerializer, ShowroomPurchaseSerializer
+from .serializers import ShowroomSerializer, ShowroomCarCharacteristicsSerializer, ShowroomCarSerializer, \
+    ShowroomDiscountSerializer, ShowroomPurchaseSerializer
 
 
 class ShowroomViewSet(BaseModelViewSet):
     serializer_class = ShowroomSerializer
+
+
+class ShowroomCarCharacteristicsViewSet(BaseModelViewSet):
+    serializer_class = ShowroomCarCharacteristicsSerializer
+    permission_classes = [IsAdminUser]
 
 
 class ShowroomCarViewSet(BaseModelViewSet):
@@ -14,21 +19,6 @@ class ShowroomCarViewSet(BaseModelViewSet):
 
 class ShowroomDiscountViewSet(BaseModelViewSet):
     serializer_class = ShowroomDiscountSerializer
-
-
-class ShowroomCarBrandViewSet(BaseModelViewSet):
-    serializer_class = ShowroomCarBrandSerializer
-    permission_classes = [IsAdminUser]
-
-
-class ShowroomCarFuelViewSet(BaseModelViewSet):
-    serializer_class = ShowroomCarFuelSerializer
-    permission_classes = [IsAdminUser]
-
-
-class ShowroomCarTransmissionViewSet(BaseModelViewSet):
-    serializer_class = ShowroomCarTransmissionSerializer
-    permission_classes = [IsAdminUser]
 
 
 class ShowroomPurchaseViewSet(BaseModelViewSet):

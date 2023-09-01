@@ -1,6 +1,5 @@
 from car_showroom.serializers import BaseModelSerializer
-from .models import Showroom, ShowroomCar, ShowroomDiscount, ShowroomCarBrand, ShowroomCarFuel, ShowroomCarTransmission, \
-    ShowroomPurchase
+from .models import Showroom, ShowroomCarCharacteristics, ShowroomCar, ShowroomDiscount, ShowroomPurchase
 
 
 class ShowroomSerializer(BaseModelSerializer):
@@ -8,6 +7,14 @@ class ShowroomSerializer(BaseModelSerializer):
 
     class Meta:
         model = Showroom
+        fields = '__all__'
+
+
+class ShowroomCarCharacteristicsSerializer(BaseModelSerializer):
+    private_fields = []
+
+    class Meta:
+        model = ShowroomCarCharacteristics
         fields = '__all__'
 
 
@@ -20,30 +27,6 @@ class ShowroomCarSerializer(BaseModelSerializer):
 class ShowroomDiscountSerializer(BaseModelSerializer):
     class Meta:
         model = ShowroomDiscount
-        fields = '__all__'
-
-
-class ShowroomCarBrandSerializer(BaseModelSerializer):
-    private_fields = []
-
-    class Meta:
-        model = ShowroomCarBrand
-        fields = '__all__'
-
-
-class ShowroomCarFuelSerializer(BaseModelSerializer):
-    private_fields = []
-
-    class Meta:
-        model = ShowroomCarFuel
-        fields = '__all__'
-
-
-class ShowroomCarTransmissionSerializer(BaseModelSerializer):
-    private_fields = []
-
-    class Meta:
-        model = ShowroomCarTransmission
         fields = '__all__'
 
 

@@ -8,52 +8,45 @@ from .serializers import LoginSerializer, RefreshTokenSerializer
 from .models import Customer
 
 
-def get_data_for_serializer(obj, request):
-    if not request.user.is_superuser:
-        return {key: value for key, value in request.data.items() if key in obj.allowed_fields}
-    else:
-        return request.data
+class AuthorizationService:
+    def login(self, request):
+        serializer = LoginSerializer(data=request.data)
 
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-def login(request):
-    serializer = LoginSerializer(data=request.data)
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
 
-    try:
-        serializer.is_valid(raise_exception=True)
-    except ValidationError as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = Customer.objects.get(username=username)
+        except ObjectDoesNotExist:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
-    username = serializer.validated_data['username']
-    password = serializer.validated_data['password']
+        if not user.check_password(password):
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        user = Customer.objects.get(username=username)
-    except ObjectDoesNotExist:
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        user_id = user.id
+        payload = {"user_id": user_id, "username": username}
 
-    if not user.check_password(password):
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        tokens = get_tokens(payload)
 
-    user_id = user.id
-    payload = {"user_id": user_id, "username": username}
+        last_login(request, user)
 
-    tokens = get_tokens(payload)
+        return Response(tokens, status=status.HTTP_200_OK)
 
-    last_login(request, user)
+    def refresh_token(self, request):
+        serializer = RefreshTokenSerializer(data=request.data)
 
-    return Response(tokens, status=status.HTTP_200_OK)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+        refresh_token = serializer.validated_data['refresh']
 
-def refresh_token(request):
-    serializer = RefreshTokenSerializer(data=request.data)
+        access_token = refresh_access_token(refresh_token)
 
-    try:
-        serializer.is_valid(raise_exception=True)
-    except ValidationError as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-    refresh_token = serializer.validated_data['refresh']
-
-    access_token = refresh_access_token(refresh_token)
-
-    return Response(access_token, status=status.HTTP_200_OK)
+        return Response(access_token, status=status.HTTP_200_OK)

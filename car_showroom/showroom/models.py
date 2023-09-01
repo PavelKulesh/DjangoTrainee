@@ -24,45 +24,19 @@ class Showroom(BaseModel):
         ordering = ['-updated_at']
 
 
-class ShowroomCarBrand(BaseModel):
-    showroom = models.ForeignKey(Showroom, on_delete=models.RESTRICT, null=True)
-    brand = models.CharField(max_length=20, choices=BaseCarCharacteristics.BRAND_CHOICES)
+class ShowroomCarCharacteristics(BaseModel):
+    showroom = models.ForeignKey(Showroom, on_delete=models.RESTRICT)
+    brand = models.CharField(max_length=20, choices=BaseCarCharacteristics.BRAND_CHOICES, null=True)
+    fuel = models.CharField(max_length=20, choices=BaseCarCharacteristics.FUEL_TYPE_CHOICES, null=True)
+    transmission = models.CharField(max_length=20, choices=BaseCarCharacteristics.TRANSMISSION_CHOICES, null=True)
 
     def __str__(self):
-        return self.brand
+        return f'Charact of {self.showroom}'
 
     class Meta:
-        db_table = 'sr_car_brands'
-        verbose_name = 'SR_Brand'
-        verbose_name_plural = 'SR_Brands'
-        ordering = ['-updated_at']
-
-
-class ShowroomCarFuel(BaseModel):
-    showroom = models.ForeignKey(Showroom, on_delete=models.RESTRICT, null=True)
-    fuel = models.CharField(max_length=20, choices=BaseCarCharacteristics.FUEL_TYPE_CHOICES)
-
-    def __str__(self):
-        return self.fuel
-
-    class Meta:
-        db_table = 'sr_car_fuel'
-        verbose_name = 'SR_Fuel'
-        verbose_name_plural = 'SR_Fuel'
-        ordering = ['-updated_at']
-
-
-class ShowroomCarTransmission(BaseModel):
-    showroom = models.ForeignKey(Showroom, on_delete=models.RESTRICT, null=True)
-    transmission = models.CharField(max_length=20, choices=BaseCarCharacteristics.TRANSMISSION_CHOICES)
-
-    def __str__(self):
-        return self.transmission
-
-    class Meta:
-        db_table = 'sr_car_transmissions'
-        verbose_name = 'SR_Transmission'
-        verbose_name_plural = 'SR_Transmissions'
+        db_table = 'sr_car_charact'
+        verbose_name = 'SR_Charact'
+        verbose_name_plural = 'SR_Characts'
         ordering = ['-updated_at']
 
 
