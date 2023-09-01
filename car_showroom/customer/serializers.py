@@ -6,34 +6,18 @@ from .models import Customer, CustomerPurchase, CustomerOffer
 class CustomerSerializer(BaseModelSerializer):
     private_fields = ['last_login', 'is_superuser', 'is_staff', 'is_active', 'created_at', 'groups',
                       'user_permissions']
-    password = serializers.CharField(max_length=128, write_only=True)
 
     class Meta:
         model = Customer
         fields = '__all__'
+        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
-
-        customer = Customer.objects.create(**validated_data)
-
-        if password:
-            customer.set_password(password)
-            customer.save()
-
+        password = validated_data.pop('password')
+        customer = Customer(**validated_data)
+        customer.set_password(password)
+        customer.save()
         return customer
-
-    def update(self, instance, validated_data):
-        password = validated_data.pop('password', None)
-
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-
-        if password:
-            instance.set_password(password)
-
-        instance.save()
-        return instance
 
 
 class CustomerPurchaseSerializer(BaseModelSerializer):

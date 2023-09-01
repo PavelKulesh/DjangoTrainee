@@ -28,6 +28,8 @@ celery = "*"
 redis = "*"
 flower = "*"
 django-celery-beat = "*"
+drf-yasg = "*"
+django-debug-toolbar = "*"
 
 [dev-packages]
 
