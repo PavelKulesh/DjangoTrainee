@@ -14,10 +14,10 @@ class JWTAuthentication(BaseAuthentication):
         try:
             _, token = auth_header.split()
             payload = check_token(token)
+            user_id = payload.get('user_id')
         except Exception as e:
             raise Exception("Invalid Access Token")
 
-        user_id = payload.get('user_id')
         try:
             user = Customer.objects.get(id=user_id)
         except Customer.DoesNotExist:
