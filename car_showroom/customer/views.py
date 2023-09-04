@@ -10,6 +10,9 @@ from rest_framework.permissions import AllowAny
 from car_showroom.permissions import IsSuperUserOrOwner, IsSuperUserOrOwnerReadOnly, IsSuperUserOrOwnerAndEmailConfirmed
 from .serializers import CustomerSerializer, CustomerPurchaseSerializer, CustomerOfferSerializer
 from .models import Customer, CustomerPurchase, CustomerOffer
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from .filters import CustomerFilter, CustomerOfferFilter, CustomerPurchaseFilter
 from .utils import get_data_for_serializer, generate_confirmation_url, send_confirmation_email, get_customer, \
     confirm_customer, generate_reset_url, send_reset_email, generate_change_url, send_change_email
 from .services import AuthorizationService
@@ -19,6 +22,10 @@ class CustomerViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerSerializer
     permission_classes = [IsSuperUserOrOwner]
     allowed_fields = ['first_name', 'last_name', 'username', 'email', 'password']
+    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
+    filterset_class = CustomerFilter
+    ordering_fields = ['balance']
+    search_fields = ['username', 'first_name', 'last_name']
 
     def get_queryset(self):
         queryset = Customer.objects.all()
@@ -138,6 +145,9 @@ class CustomerViewSet(viewsets.ModelViewSet):
 class CustomerPurchaseViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerPurchaseSerializer
     permission_classes = [IsSuperUserOrOwnerReadOnly]
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filterset_class = CustomerPurchaseFilter
+    ordering_fields = ['price']
 
     def get_queryset(self):
         queryset = CustomerPurchase.objects.all()
@@ -152,6 +162,9 @@ class CustomerOfferViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerOfferSerializer
     permission_classes = [IsSuperUserOrOwnerAndEmailConfirmed]
     allowed_fields = ['model', 'max_price']
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filterset_class = CustomerOfferFilter
+    ordering_fields = ['max_price']
 
     def get_queryset(self):
         queryset = CustomerOffer.objects.all()
