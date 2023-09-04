@@ -1,0 +1,103 @@
+version: '3'
+
+services:
+  django:
+    container_name: django
+    restart: unless-stopped
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./car_showroom/.env
+    volumes:
+      - ./car_showroom:/app
+    depends_on:
+      - postgres
+    entrypoint: [ "/entrypoint.sh", "django" ]
+
+  postgres:
+    container_name: postgres
+    restart: unless-stopped
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./car_showroom/.env
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: pgadmin4
+    restart: unless-stopped
+    image: dpage/pgadmin4
+    env_file:
+      - ./car_showroom/.env
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+
+  redis:
+    container_name: redis
+    restart: unless-stopped
+    image: redis:alpine
+    ports:
+      - '6379:6379'
+
+  celery:
+    container_name: celery
+    restart: unless-stopped
+    build: .
+    env_file:
+      - ./car_showroom/.env
+    volumes:
+      - ./car_showroom:/app
+    depends_on:
+      - redis
+    entrypoint: [ "/entrypoint.sh", "celery" ]
+
+  celery_beat:
+    container_name: celery_beat
+    restart: unless-stopped
+    build:
+      context: ./
+    volumes:
+      - ./car_showroom:/app
+    depends_on:
+      - redis
+    env_file:
+      - ./car_showroom/.env
+    entrypoint: [ "/entrypoint.sh", "celery_beat" ]
+
+  flower:
+    container_name: flower
+    restart: unless-stopped
+    build:
+      context: .
+    volumes:
+      - ./car_showroom:/app
+    depends_on:
+      - redis
+      - celery
+    env_file:
+      - ./car_showroom/.env
+    ports:
+      - "5555:5555"
+    entrypoint: [ "/entrypoint.sh", "flower" ]
+
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: nginx/Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./car_showroom:/app
+    depends_on:
+      - django
+
+volumes:
+  db:
+  pgadmin:
