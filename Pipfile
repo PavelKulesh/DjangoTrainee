@@ -30,6 +30,7 @@ flower = "*"
 django-celery-beat = "*"
 drf-yasg = "*"
 django-debug-toolbar = "*"
+gunicorn = "*"
 
 [dev-packages]
 

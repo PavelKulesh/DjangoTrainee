@@ -58,5 +58,18 @@ services:
       - ./car_showroom/.env
     entrypoint: [ "/entrypoint.sh", "celery_beat" ]
 
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: nginx/Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./car_showroom:/app
+    depends_on:
+      - django
+
 volumes:
   db:

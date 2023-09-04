@@ -85,6 +85,19 @@ services:
       - "5555:5555"
     entrypoint: [ "/entrypoint.sh", "flower" ]
 
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: nginx/Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./car_showroom:/app
+    depends_on:
+      - django
+
 volumes:
   db:
   pgadmin:

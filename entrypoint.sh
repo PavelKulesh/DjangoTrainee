@@ -2,7 +2,7 @@
 
 case "$1" in
   "django")
-    python manage.py runserver 0.0.0.0:8000
+    gunicorn car_showroom.wsgi:application -c gunicorn_config.py
     ;;
   "celery")
     celery -A car_showroom worker --loglevel=info
