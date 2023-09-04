@@ -17,9 +17,9 @@ class CustomerFilter(filters.FilterSet):
 
 
 class CustomerOfferFilter(filters.FilterSet):
-    customer = filters.ModelChoiceFilter(queryset=Customer.objects.all())
+    customer = filters.ModelChoiceFilter(queryset=Customer.objects.filter(is_active=True))
     max_price = filters.RangeFilter()
-    model = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.all())
+    model = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.filter(is_active=True))
 
     class Meta:
         model = CustomerOffer
@@ -27,9 +27,9 @@ class CustomerOfferFilter(filters.FilterSet):
 
 
 class CustomerPurchaseFilter(filters.FilterSet):
-    customer = filters.ModelChoiceFilter(queryset=Customer.objects.all())
-    showroom = filters.ModelChoiceFilter(queryset=Showroom.objects.all())
-    model = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.all())
+    customer = filters.ModelChoiceFilter(queryset=Customer.objects.filter(is_active=True))
+    showroom = filters.ModelChoiceFilter(queryset=Showroom.objects.filter(is_active=True))
+    model = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.filter(is_active=True))
     price = filters.RangeFilter()
 
     class Meta:

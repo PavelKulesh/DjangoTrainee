@@ -7,7 +7,7 @@ class ProviderFilter(filters.FilterSet):
     foundation_year = filters.RangeFilter()
     showroom_quantity = filters.RangeFilter()
     balance = filters.RangeFilter()
-    model_list = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.all())
+    model_list = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.filter(is_active=True))
     discount_percent = filters.RangeFilter()
     quantity_for_discount = filters.RangeFilter()
 
@@ -18,8 +18,8 @@ class ProviderFilter(filters.FilterSet):
 
 
 class ProviderCarFilter(filters.FilterSet):
-    provider = filters.ModelChoiceFilter(queryset=Provider.objects.all())
-    model = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.all())
+    provider = filters.ModelChoiceFilter(queryset=Provider.objects.filter(is_active=True))
+    model = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.filter(is_active=True))
     provider_price = filters.RangeFilter()
 
     class Meta:
@@ -30,8 +30,8 @@ class ProviderCarFilter(filters.FilterSet):
 class ProviderDiscountFilter(filters.FilterSet):
     start_at = filters.DateFilter(lookup_expr='gte')
     end_at = filters.DateFilter(lookup_expr='lte')
-    provider = filters.ModelChoiceFilter(queryset=Provider.objects.all())
-    model_list = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.all())
+    provider = filters.ModelChoiceFilter(queryset=Provider.objects.filter(is_active=True))
+    model_list = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.filter(is_active=True))
 
     class Meta:
         model = ProviderDiscount
