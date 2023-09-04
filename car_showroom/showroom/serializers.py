@@ -1,3 +1,4 @@
+from rest_framework import serializers
 from car_showroom.serializers import BaseModelSerializer
 from .models import Showroom, ShowroomCarCharacteristics, ShowroomCar, ShowroomDiscount, ShowroomPurchase
 
@@ -36,3 +37,9 @@ class ShowroomPurchaseSerializer(BaseModelSerializer):
     class Meta:
         model = ShowroomPurchase
         fields = '__all__'
+
+
+class ShowroomStatisticsSerializer(serializers.Serializer):
+    count_of_sales = serializers.IntegerField()
+    total_cost_of_sales = serializers.DecimalField(max_digits=12, decimal_places=2)
+    count_of_unique_customers = serializers.IntegerField()

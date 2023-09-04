@@ -1,4 +1,6 @@
+from rest_framework import serializers
 from car_showroom.serializers import BaseModelSerializer
+from car.serializers import CarModelSerializer
 from .models import Provider, ProviderCar, ProviderDiscount
 
 
@@ -20,3 +22,9 @@ class ProviderDiscountSerializer(BaseModelSerializer):
     class Meta:
         model = ProviderDiscount
         fields = '__all__'
+
+
+class ProviderStatisticsSerializer(serializers.Serializer):
+    count_of_sales = serializers.IntegerField()
+    total_cost_of_sales = serializers.DecimalField(max_digits=12, decimal_places=2)
+    list_of_sold_cars = CarModelSerializer(many=True)

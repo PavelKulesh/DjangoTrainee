@@ -8,14 +8,15 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from car_showroom.permissions import IsSuperUserOrOwner, IsSuperUserOrOwnerReadOnly, IsSuperUserOrOwnerAndEmailConfirmed
-from .serializers import CustomerSerializer, CustomerPurchaseSerializer, CustomerOfferSerializer
+from .serializers import CustomerSerializer, CustomerPurchaseSerializer, CustomerOfferSerializer, \
+    CustomerStatisticsSerializer
 from .models import Customer, CustomerPurchase, CustomerOffer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .filters import CustomerFilter, CustomerOfferFilter, CustomerPurchaseFilter
 from .utils import get_data_for_serializer, generate_confirmation_url, send_confirmation_email, get_customer, \
     confirm_customer, generate_reset_url, send_reset_email, generate_change_url, send_change_email
-from .services import AuthorizationService
+from .services import AuthorizationService, CustomerStatisticsService
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -216,3 +217,26 @@ class AuthViewSet(viewsets.ViewSet):
             return auth_service.refresh_token(request)
         else:
             return Response({'error': 'Invalid action! Choose login or refresh.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomerStatisticsViewSet(viewsets.ViewSet):
+    def retrieve(self, request, pk=None):
+        try:
+            customer = Customer.objects.get(pk=pk)
+        except ObjectDoesNotExist:
+            return Response({'message': 'Customer not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        total_cost_amount = CustomerStatisticsService.total_cost_amount(customer)
+        count_of_purchases = CustomerStatisticsService.count_of_purchases(customer)
+        list_of_bought_cars = CustomerStatisticsService.list_of_bought_cars(customer)
+
+        serializer = CustomerStatisticsSerializer(
+            {
+                'total_cost_amount': total_cost_amount,
+                'count_of_purchases': count_of_purchases,
+                'list_of_bought_cars': list_of_bought_cars,
+            },
+            context={'request': request}
+        )
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
