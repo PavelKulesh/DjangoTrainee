@@ -31,6 +31,7 @@ class CustomerPurchaseSerializer(BaseModelSerializer):
 
 class CustomerOfferSerializer(BaseModelSerializer):
     private_fields = ['is_active']
+    max_price = serializers.DecimalField(max_digits=12, decimal_places=2, required=True)
 
     class Meta:
         model = CustomerOffer

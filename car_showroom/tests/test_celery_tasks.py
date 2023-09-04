@@ -1,3 +1,4 @@
+import os
 from _decimal import Decimal, ROUND_DOWN
 import pytest
 from django.db import transaction
@@ -131,7 +132,7 @@ def test_update_showroom_car(showroom, car_model, provider):
 
     showroom_car.refresh_from_db()
 
-    assert showroom_car.showroom_price == 11000
+    assert showroom_car.showroom_price == float(os.getenv('SHOWROOM_PERCENT')) * 10000
 
 
 @pytest.mark.django_db

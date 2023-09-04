@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from car_showroom.jwt_auth import check_token
@@ -20,7 +21,7 @@ class JWTAuthentication(BaseAuthentication):
 
         try:
             user = Customer.objects.get(id=user_id)
-        except Customer.DoesNotExist:
+        except ObjectDoesNotExist:
             raise AuthenticationFailed('No user found with this token')
 
         return (user, token)

@@ -7,7 +7,7 @@ from .models import Showroom, ShowroomCarCharacteristics, ShowroomCar, ShowroomP
 
 class ShowroomFilter(filters.FilterSet):
     location = filters.ChoiceFilter(choices=django_countries.countries)
-    model_list = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.all())
+    model_list = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.filter(is_active=True))
     discount_percent = filters.RangeFilter()
     quantity_for_discount = filters.RangeFilter()
 
@@ -17,7 +17,7 @@ class ShowroomFilter(filters.FilterSet):
 
 
 class ShowroomCarCharacteristicsFilter(filters.FilterSet):
-    showroom = filters.ModelChoiceFilter(queryset=Showroom.objects.all())
+    showroom = filters.ModelChoiceFilter(queryset=Showroom.objects.filter(is_active=True))
     brand = filters.MultipleChoiceFilter(choices=CarModel.BRAND_CHOICES)
     fuel = filters.MultipleChoiceFilter(choices=CarModel.FUEL_TYPE_CHOICES)
     transmission = filters.MultipleChoiceFilter(choices=CarModel.TRANSMISSION_CHOICES)
@@ -28,9 +28,9 @@ class ShowroomCarCharacteristicsFilter(filters.FilterSet):
 
 
 class ShowroomCarFilter(filters.FilterSet):
-    showroom = filters.ModelChoiceFilter(queryset=Showroom.objects.all())
-    model = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.all())
-    provider = filters.ModelMultipleChoiceFilter(queryset=Provider.objects.all())
+    showroom = filters.ModelChoiceFilter(queryset=Showroom.objects.filter(is_active=True))
+    model = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.filter(is_active=True))
+    provider = filters.ModelMultipleChoiceFilter(queryset=Provider.objects.filter(is_active=True))
     showroom_price = filters.RangeFilter()
     quantity = filters.RangeFilter()
 
@@ -40,9 +40,9 @@ class ShowroomCarFilter(filters.FilterSet):
 
 
 class ShowroomPurchaseFilter(filters.FilterSet):
-    showroom = filters.ModelChoiceFilter(queryset=Showroom.objects.all())
-    provider = filters.ModelMultipleChoiceFilter(queryset=Provider.objects.all())
-    model = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.all())
+    showroom = filters.ModelChoiceFilter(queryset=Showroom.objects.filter(is_active=True))
+    provider = filters.ModelMultipleChoiceFilter(queryset=Provider.objects.filter(is_active=True))
+    model = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.filter(is_active=True))
     quantity = filters.RangeFilter()
     amount = filters.RangeFilter()
 
@@ -54,8 +54,8 @@ class ShowroomPurchaseFilter(filters.FilterSet):
 class ShowroomDiscountFilter(filters.FilterSet):
     start_at = filters.DateFilter(lookup_expr='gte')
     end_at = filters.DateFilter(lookup_expr='lte')
-    showroom = filters.ModelChoiceFilter(queryset=Showroom.objects.all())
-    model_list = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.all())
+    showroom = filters.ModelChoiceFilter(queryset=Showroom.objects.filter(is_active=True))
+    model_list = filters.ModelMultipleChoiceFilter(queryset=CarModel.objects.filter(is_active=True))
 
     class Meta:
         model = ShowroomDiscount

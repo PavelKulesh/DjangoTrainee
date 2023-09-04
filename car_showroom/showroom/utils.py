@@ -1,3 +1,4 @@
+import os
 from _decimal import Decimal
 from django.db import transaction
 from django.db.models import F, Max, Sum, Case, When, DecimalField
@@ -44,7 +45,7 @@ def update_showroom_car(showroom, car, provider_car):
         model=car,
         provider=provider_car.provider,
     )
-    showroom_car.showroom_price = provider_car.final_price * Decimal(1.1)
+    showroom_car.showroom_price = provider_car.final_price * Decimal(os.getenv('SHOWROOM_PERCENT'))
     showroom_car.save()
 
 
@@ -89,7 +90,7 @@ def process_successful_purchase(showroom, provider, model, showroom_car, price_w
         quantity=quantity,
     )
     showroom_purchase.amount = Decimal(quantity * price_with_discount)
-    showroom_car.showroom_price = price_with_discount * Decimal(1.1)
+    showroom_car.showroom_price = price_with_discount * Decimal(os.getenv('SHOWROOM_PERCENT'))
     showroom_car.quantity += quantity
 
     showroom.save()

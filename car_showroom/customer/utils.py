@@ -1,3 +1,4 @@
+import os
 from _decimal import Decimal
 from django.core.mail import send_mail
 from django.conf import settings
@@ -78,7 +79,7 @@ def generate_confirmation_url(customer):
     token = default_token_generator.make_token(customer)
     uid = urlsafe_base64_encode(force_bytes(customer.pk))
 
-    confirmation_url = f"http://localhost:8000/api/customer/confirm/{uid}/{token}/"
+    confirmation_url = f"{os.getenv('URL')}/api/customer/confirm/{uid}/{token}/"
 
     return confirmation_url
 
@@ -106,7 +107,7 @@ def generate_reset_url(customer):
     token = default_token_generator.make_token(customer)
     uid = urlsafe_base64_encode(force_bytes(customer.pk))
 
-    reset_url = f"http://localhost:8000/api/customer/password-reset/{uid}/{token}/"
+    reset_url = f"{os.getenv('URL')}/api/customer/password-reset/{uid}/{token}/"
 
     return reset_url
 
@@ -122,7 +123,7 @@ def generate_change_url(customer):
     token = default_token_generator.make_token(customer)
     uid = urlsafe_base64_encode(force_bytes(customer.pk))
 
-    change_url = f"http://localhost:8000/api/customer/email-change/{uid}/{token}/"
+    change_url = f"{os.getenv('URL')}/api/customer/email-change/{uid}/{token}/"
 
     return change_url
 
